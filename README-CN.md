@@ -1,14 +1,15 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/1651790/224081217-86521beb-1b69-4071-b195-f2ce0bb33db7.png">
-  <img alt="NebulaGraph Data Intelligence Suite(ngdi)" src="https://user-images.githubusercontent.com/1651790/224081979-d3aa7867-94a6-4a85-a5d7-603e02360cee.png">
+<img alt="Choosejourney" src="https://s21.ax1x.com/2024/10/20/pAatlLR.png">
 </picture>
 
 <p align="center">
 
-  <a href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc" target="_blank">
-    <img alt="Chrome" src="https://img.shields.io/chrome-web-store/stars/ogjibjphoadhljaoicdnjnmgokohngcc?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
+  <a href="https://chromewebstore.google.com/detail/choosejourney/lhhnmdfkkdmflpnpcngmiofcnokikmgf?authuser=0&hl=zh-CN" target="_blank">
+    <img src="https://s21.ax1x.com/2024/10/20/pAatrwt.png" />
   </a>
-
+  <a href="https://microsoftedge.microsoft.com/addons/detail/choosejourney/mfpjhghgmaicdaaljjgiglmmdjoiacga" target="_blank">
+    <img src="https://s21.ax1x.com/2024/10/20/pAatDeI.png" />
+  </a>
 </p>
 
 # 为什么造这个轮子
@@ -31,15 +32,15 @@
 # 怎么安装
 
 1. 访问您的浏览器扩展商店以安装此插件：
+<p align="center">
 
-   <p align="center">
-     <a target="_blank" href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc">
-       <img src="https://img.shields.io/chrome-web-store/v/ogjibjphoadhljaoicdnjnmgokohngcc?label=Chrome%20Web%20Store&style=for-the-badge&color=blue&logo=google-chrome&logoColor=white" />
-     </a>
-     <a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/openai-translator/">
-       <img src="https://img.shields.io/amo/v/openai-translator?label=Firefox%20Add-on&style=for-the-badge&color=orange&logo=firefox&logoColor=white" />
-     </a>
-   </p>
+  <a href="https://chromewebstore.google.com/detail/choosejourney/lhhnmdfkkdmflpnpcngmiofcnokikmgf?authuser=0&hl=zh-CN" target="_blank">
+    <img src="https://s21.ax1x.com/2024/10/20/pAatrwt.png" />
+  </a>
+  <a href="https://microsoftedge.microsoft.com/addons/detail/choosejourney/mfpjhghgmaicdaaljjgiglmmdjoiacga" target="_blank">
+    <img src="https://s21.ax1x.com/2024/10/20/pAatDeI.png" />
+  </a>
+</p>
 
 2. 在浏览器侧边插件视图中右键点击 AI 图标，然后将获得的 API 密钥以及翻译密钥输入到该插件，保存。
 
@@ -63,6 +64,10 @@
 - [ ] 支持更多的翻译接口
 - [ ] 提供默认的 AI 与翻译
 - [ ] 欢迎提供意见 👏
+
+# 支持本项目
+
+![赞助我](打赏码.png)
 
 # License
 

@@ -1,68 +1,81 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/1651790/224081217-86521beb-1b69-4071-b195-f2ce0bb33db7.png">
-  <img alt="NebulaGraph Data Intelligence Suite(ngdi)" src="https://user-images.githubusercontent.com/1651790/224081979-d3aa7867-94a6-4a85-a5d7-603e02360cee.png">
+<img alt="Choosejourney" src="https://s21.ax1x.com/2024/10/20/pAatlLR.png">
 </picture>
 
 <p align="center">
-
-  <a href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc" target="_blank">
-    <img alt="Chrome" src="https://img.shields.io/chrome-web-store/stars/ogjibjphoadhljaoicdnjnmgokohngcc?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
-  </a>
-
+    <br> English | <a href="README-CN.md">中文</a>
+</p>
+<p align="center">
+    <em>AI empowers a general-purpose prompt assistant, systematically generating and selecting prompts on AI generation platforms such as Midjourney, Suno, ComfyUI, and others for images, music, documents, and more.</em>
 </p>
 
-# 为什么造这个轮子
+<p align="center">
 
-在各个 AI 的使用过程中，如何编辑一个准确恰当的提示成了困扰我的问题。
+  <a href="https://chromewebstore.google.com/detail/choosejourney/lhhnmdfkkdmflpnpcngmiofcnokikmgf?authuser=0&hl=zh-CN" target="_blank">
+    <img src="https://s21.ax1x.com/2024/10/20/pAatrwt.png" />
+  </a>
+  <a href="https://microsoftedge.microsoft.com/addons/detail/choosejourney/mfpjhghgmaicdaaljjgiglmmdjoiacga" target="_blank">
+    <img src="https://s21.ax1x.com/2024/10/20/pAatDeI.png" />
+  </a>
+</p>
 
-不仅仅是如何编写最佳实践的提示词结构这一个难题，还有一个难题：探索的对应领域中的专业术语。
+# Why build this wheel?
 
-比如美术中的绘画技法风格流派、又或者音乐中的韵律节奏乐器形式、等等，这些专业的术语名词很难全部掌握或者快速的组织，在这种情况下，如何去系统的有条理的把这些内容整合成一个优秀的提示成为了一个难题。
+During the use of various AI applications, how to edit an accurate and appropriate prompt has become a challenging problem for me.
 
-# 有哪些功能
+It's not just about figuring out the best practices for structuring prompt words; there is also the challenge of exploring and mastering the specialized terminology in the corresponding field.
 
-- 支持**AI 快速生成**领域专业术语
-- 清晰的**可视化**的提示词编辑
-- 支持**备注翻译**或者提示
-- 支持编辑现有提示词并**获取翻译**
-- **随机抽取**提示词以获取灵感
-- **完全自定义**编辑用户提示词列表
+For example, in fine arts, there are painting techniques, styles, and schools of thought; in music, there are rhythms, tempos, instruments, and forms. These specialized terms are difficult to fully grasp or quickly organize. In such situations, how to systematically and coherently integrate these elements into an excellent prompt becomes a significant challenge.
 
-# 怎么安装
+# What are the features?
 
-1. 访问您的浏览器扩展商店以安装此插件：
+- Support for **AI-powered rapid generation** of domain-specific terminology
+- Clear and **visual** prompt editing
+- Support for **notes translation** or prompts
+- Support for editing existing prompts and **obtaining translations**
+- **Randomly select** prompts for inspiration
+- **Fully customize** the editing of user prompt lists
 
-   <p align="center">
-     <a target="_blank" href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc">
-       <img src="https://img.shields.io/chrome-web-store/v/ogjibjphoadhljaoicdnjnmgokohngcc?label=Chrome%20Web%20Store&style=for-the-badge&color=blue&logo=google-chrome&logoColor=white" />
-     </a>
-     <a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/openai-translator/">
-       <img src="https://img.shields.io/amo/v/openai-translator?label=Firefox%20Add-on&style=for-the-badge&color=orange&logo=firefox&logoColor=white" />
-     </a>
-   </p>
+# How to install
 
-2. 在浏览器侧边插件视图中右键点击 AI 图标，然后将获得的 API 密钥以及翻译密钥输入到该插件，保存。
+1. Visit your browser extension store to install this plugin:
+<p align="center">
+
+  <a href="https://chromewebstore.google.com/detail/choosejourney/lhhnmdfkkdmflpnpcngmiofcnokikmgf?authuser=0&hl=zh-CN" target="_blank">
+    <img src="https://s21.ax1x.com/2024/10/20/pAatrwt.png" />
+  </a>
+  <a href="https://microsoftedge.microsoft.com/addons/detail/choosejourney/mfpjhghgmaicdaaljjgiglmmdjoiacga" target="_blank">
+    <img src="https://s21.ax1x.com/2024/10/20/pAatDeI.png" />
+  </a>
+</p>
+
+2. Right-click the AI icon in the browser sidebar plugin view, then enter the obtained API key and translation key into the plugin and save.
 
    <p align="center">
      <img width="600" src="/gif/set.gif" />
    </p>
 
-3. 开始使用吧 🎉!
+3. Get started 🎉!
 
-# 怎么使用
+# How to Use
 
-见教程（待更新）。
+See Tutorial
+(To Be Updated).
 
-# 需要准备些什么
+# What Do I Need to Prepare?
 
-- 大语言模型的 API 地址及密钥
-- 百度翻译密钥（暂时仅支持百度）
+- The API address and key for the large language model
+- Baidu Translation Key (Currently Only Supports Baidu)
 
-# 未来计划
+# Future Plans
 
-- [ ] 支持更多的翻译接口
-- [ ] 提供默认的 AI 与翻译
-- [ ] 欢迎提供意见 👏
+- [ ] Support More Translation Interfaces
+- [ ] Provide Default AI and Translation
+- [ ] Welcome Your Suggestions 👏
+
+# Support this project
+
+![赞助我](打赏码.png)
 
 # License
 
