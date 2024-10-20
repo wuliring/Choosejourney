@@ -52,7 +52,7 @@ For example, in fine arts, there are painting techniques, styles, and schools of
 2. Right-click the AI icon in the browser sidebar plugin view, then enter the obtained API key and translation key into the plugin and save.
 
    <p align="center">
-     <img width="600" src="/gif/set.gif" />
+     <img width="600" src="gif\set.gif" />
    </p>
 
 3. Get started 🎉!
@@ -75,7 +75,9 @@ See Tutorial
 
 # Support this project
 
-![赞助我](打赏码.png)
+   <p align="center">
+     <img width="600" src="打赏码.png" />
+   </p>
 
 # License
 
