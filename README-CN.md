@@ -67,6 +67,8 @@
 
 # 支持本项目
 
+一包辣条 🌶 我能乐一天！
+
    <p align="center">
      <img width="600" src="打赏码.png" />
    </p>
