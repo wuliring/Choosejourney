@@ -4,13 +4,6 @@
 </picture>
 
 <p align="center">
-    <br> English | <a href="README-CN.md">中文</a>
-</p>
-<p align="center">
-    <em>AI empowers a general-purpose prompt assistant, systematically generating and selecting prompts on AI generation platforms such as Midjourney, Suno, ComfyUI, and others for images, music, documents, and more.</em>
-</p>
-
-<p align="center">
 
   <a href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc" target="_blank">
     <img alt="Chrome" src="https://img.shields.io/chrome-web-store/stars/ogjibjphoadhljaoicdnjnmgokohngcc?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
@@ -20,19 +13,24 @@
 
 # 为什么造这个轮子
 
-I have developed a [Bob](https://bobtranslate.com/) [plugin](https://github.com/yetone/bob-plugin-openai-translator) that utilizes ChatGPT API to provide global word translation on macOS. However, since not all users have access to macOS to benefit from the plugin, I have created this project!
+在各个 AI 的使用过程中，如何编辑一个准确恰当的提示成了困扰我的问题。
+
+不仅仅是如何编写最佳实践的提示词结构这一个难题，还有一个难题：探索的对应领域中的专业术语。
+
+比如美术中的绘画技法风格流派、又或者音乐中的韵律节奏乐器形式、等等，这些专业的术语名词很难全部掌握或者快速的组织，在这种情况下，如何去系统的有条理的把这些内容整合成一个优秀的提示成为了一个难题。
 
 # 有哪些功能
 
-What began as a Chrome extension has now evolved into a multi-platform desktop app that I am currently developing.
-
-<p align="center">
-  <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
-</p>
+- 支持**AI 快速生成**领域专业术语
+- 清晰的**可视化**的提示词编辑
+- 支持**备注翻译**或者提示
+- 支持编辑现有提示词并**获取翻译**
+- **随机抽取**提示词以获取灵感
+- **完全自定义**编辑用户提示词列表
 
 # 怎么安装
 
-1. Visit your Browser Extension Store to install this plugin:
+1. 访问您的浏览器扩展商店以安装此插件：
 
    <p align="center">
      <a target="_blank" href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc">
@@ -43,24 +41,28 @@ What began as a Chrome extension has now evolved into a multi-platform desktop a
      </a>
    </p>
 
-2. Click on the OpenAI Translator icon in the browser plugin list, and enter the obtained API KEY into the configuration interface that pops up from this plugin.
+2. 在浏览器侧边插件视图中右键点击 AI 图标，然后将获得的 API 密钥以及翻译密钥输入到该插件，保存。
 
    <p align="center">
-     <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
+     <img width="600" src="/gif/set.gif" />
    </p>
 
-3. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
+3. 开始使用吧 🎉!
 
 # 怎么使用
 
-<p align="center">
-  <img width="800" src="https://user-images.githubusercontent.com/1206493/223200182-6a1d2a02-3fe0-4723-bdae-99d8b7212a33.gif" />
-</p>
+见教程（待更新）。
 
 # 需要准备些什么
 
-- (required) Apply for an OpenAI API key [here](https://platform.openai.com/account/api-keys) or [Azure OpenAI Service API Key](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint)
-- (optional) If you cannot access OpenAI, you can use the OpenAI API Proxy.
+- 大语言模型的 API 地址及密钥
+- 百度翻译密钥（暂时仅支持百度）
+
+# 未来计划
+
+- [ ] 支持更多的翻译接口
+- [ ] 提供默认的 AI 与翻译
+- [ ] 欢迎提供意见 👏
 
 # License
 

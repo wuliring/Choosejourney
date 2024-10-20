@@ -44,7 +44,7 @@
 2. 在浏览器侧边插件视图中右键点击 AI 图标，然后将获得的 API 密钥以及翻译密钥输入到该插件，保存。
 
    <p align="center">
-     <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
+     <img width="600" src="/gif/set.gif" />
    </p>
 
 3. 开始使用吧 🎉!
