@@ -1,7 +1,7 @@
-<picture>
+<p align="center"><picture>
 <img alt="Choosejourney" src="https://s21.ax1x.com/2024/10/20/pAatlLR.png">
 </picture>
-
+</p>
 <p align="center">
     <br> English | <a href="README-CN.md">中文</a>
 </p>
