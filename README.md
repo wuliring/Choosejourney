@@ -59,8 +59,7 @@ For example, in fine arts, there are painting techniques, styles, and schools of
 
 # How to Use
 
-See Tutorial
-(To Be Updated).
+See [Tutorial](https://www.bilibili.com/video/BV1JyyoYLEM7/?vd_source=0d9e91cd63d05b51d2de4a17f8085642)
 
 # What Do I Need to Prepare?
 

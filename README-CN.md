@@ -52,7 +52,7 @@
 
 # 怎么使用
 
-见教程（待更新）。
+见[教程](https://www.bilibili.com/video/BV1JyyoYLEM7/?vd_source=0d9e91cd63d05b51d2de4a17f8085642)。
 
 # 需要准备些什么
 
