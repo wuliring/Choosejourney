@@ -1,5 +1,5 @@
 <p align="center"><picture>
-<img alt="Choosejourney" src="https://s21.ax1x.com/2024/10/20/pAatlLR.png">
+<img alt="Choosejourney" src="https://yanick.oss-cn-beijing.aliyuncs.com/img/README-2024-11-02-06-36-46.png">
 </picture>
 </p>
 <p align="center">
@@ -12,10 +12,10 @@
 <p align="center">
 
   <a href="https://chromewebstore.google.com/detail/choosejourney/lhhnmdfkkdmflpnpcngmiofcnokikmgf?authuser=0&hl=zh-CN" target="_blank">
-    <img src="https://s21.ax1x.com/2024/10/20/pAatrwt.png" />
+    <img src="https://yanick.oss-cn-beijing.aliyuncs.com/img/README-2024-11-02-06-37-42.png" />
   </a>
   <a href="https://microsoftedge.microsoft.com/addons/detail/choosejourney/mfpjhghgmaicdaaljjgiglmmdjoiacga" target="_blank">
-    <img src="https://s21.ax1x.com/2024/10/20/pAatDeI.png" />
+    <img src="https://yanick.oss-cn-beijing.aliyuncs.com/img/README-2024-11-02-06-37-19.png" />
   </a>
 </p>
 
@@ -42,10 +42,10 @@ For example, in fine arts, there are painting techniques, styles, and schools of
 <p align="center">
 
   <a href="https://chromewebstore.google.com/detail/choosejourney/lhhnmdfkkdmflpnpcngmiofcnokikmgf?authuser=0&hl=zh-CN" target="_blank">
-    <img src="https://s21.ax1x.com/2024/10/20/pAatrwt.png" />
+    <img src="https://yanick.oss-cn-beijing.aliyuncs.com/img/README-2024-11-02-06-37-42.png" />
   </a>
   <a href="https://microsoftedge.microsoft.com/addons/detail/choosejourney/mfpjhghgmaicdaaljjgiglmmdjoiacga" target="_blank">
-    <img src="https://s21.ax1x.com/2024/10/20/pAatDeI.png" />
+    <img src="https://yanick.oss-cn-beijing.aliyuncs.com/img/README-2024-11-02-06-37-19.png" />
   </a>
 </p>
 
