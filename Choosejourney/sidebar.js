@@ -182,6 +182,7 @@ const uploadButton = document.getElementById('upload-button');
 const copyButton = document.getElementById('copy-button');
 const clipboardButton = document.getElementById('clipboard-button');
 const clearButton = document.getElementById('clear-button');
+const setButton = document.getElementById('set-button');
 const processButton = document.getElementById('process-button');
 const themeToggleButton = document.getElementById('theme-toggle-button');
 const upperSection = document.querySelector('.upper-section');
@@ -194,57 +195,43 @@ const itemContainer = document.getElementById('item-container');
 const buttonContainer = document.getElementById('category-buttons');
 const subcategoryList = document.getElementById('subcategory-list');
 const selectionRectangle = document.getElementById('selection-rectangle');
+const submitButton = document.getElementById('submit-button');
+const inputBox = document.getElementById('input-box');
+const wrapper = document.getElementById('wrapper');
+
+
+
 let organizedData = {};
 let cycleNumber = 3;
 let deleteMode = false;
 let isUpperSectionHidden = false;
+let randomMode = false; // 新增随机模式变量
+
+
 document.addEventListener('DOMContentLoaded', function () {
     checkForCachedData();
     initializeSelection();
-    tooltip.className = 'tooltip no-pointer';
-    document.body.appendChild(tooltip);
-    updateTooltip();
+    addSpecialButton(dragDropArea, '编辑区');
+    observeDragDropArea();
+    dragDropArea.addEventListener('dragover', (e) => e.preventDefault());
+    dragDropArea.addEventListener('drop', handleDrop);
+
     [statusMessage, ...buttons].forEach(element => {
         element.addEventListener('mouseenter', function () {
             const title = this.getAttribute('data-tooltip');
             if (title) {
                 const formattedTitle = title.replace(/，/g, '\n');
-                tooltip.textContent = formattedTitle;
-                tooltip.classList.add('show');
-                const rect = this.getBoundingClientRect();
-                tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - tooltip.offsetWidth / 2}px`;
-                tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 5}px`;
+                statusMessage.textContent = formattedTitle;
             }
         });
-        element.addEventListener('mouseleave', function () {
-            tooltip.classList.remove('show');
-        });
     });
-    document.getElementById('process-button').addEventListener('contextmenu', function (event) {
-        event.preventDefault();
-        cycleNumber = cycleNumber % 7 + 1;
-        updateTooltip();
-        showTooltip(document.getElementById('process-button'), "+1");
-    });
+
     [upperSection, lowerSection].forEach(section => {
         section.addEventListener('contextmenu', function (event) {
             event.preventDefault();
         });
     });
-    dragDropArea.addEventListener('dragover', (e) => e.preventDefault());
-    dragDropArea.addEventListener('drop', handleDrop);
 });
-function updateTooltip() {
-    const tooltipText = `左键随机抽取${cycleNumber}次，右键切换随机数量（1~7）`;
-    processButton.setAttribute('data-tooltip', tooltipText);
-    if (tooltip.classList.contains('show')) {
-        const formattedText = tooltipText.replace(/，/g, '\n');
-        tooltip.textContent = formattedText;
-        const rect = processButton.getBoundingClientRect();
-        tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - tooltip.offsetWidth / 2}px`;
-        tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 5}px`;
-    }
-}
 function checkForCachedData() {
     const cachedData = localStorage.getItem('parsedCSVData');
     if (cachedData) {
@@ -383,6 +370,9 @@ function clearAllActiveStates(container) {
         }
     });
 }
+
+
+
 function createMainMenu(data) {
     data.forEach(item => {
         if (item.superType && item.dir && item.text) {
@@ -404,11 +394,11 @@ function createMainMenu(data) {
             const button = document.createElement('button');
             button.textContent = superType;
             button.className = 'button button-superType';
-            let hoverTimeout;
-            let tooltipElement;
             button.onclick = (event) => {
                 if (deleteMode) {
                     handleDeleteClick.call(button, event);
+                } else if (randomMode) { // 新增随机模式判断
+                    handleRandomClick.call(button, event);
                 } else {
                     itemContainer.innerHTML = '';
                     if (button.classList.contains('skip')) {
@@ -425,46 +415,31 @@ function createMainMenu(data) {
                     }
                 }
             };
-            button.addEventListener('contextmenu', function (event) {
-                event.preventDefault();
-                if (deleteMode) {
-                    handleDeleteClick.call(button, event);
-                } else {
-                    if (button.classList.contains('active-skip')) {
-                        button.classList.remove('active-skip');
-                        button.classList.add('active');
-                    } else if (button.classList.contains('skip')) {
-                        button.classList.remove('skip');
-                    } else if (button.classList.contains('active')) {
-                        button.classList.remove('active');
-                        button.classList.add('active-skip');
-                    } else {
-                        button.classList.add('skip');
-                    }
-                }
-            });
-            button.addEventListener('mouseenter', function (event) {
-                hoverTimeout = setTimeout(() => {
-                    tooltipElement = showTheTooltip(event, "左键选择\n右键取消随机抽取");
-                }, 2000);
-            });
-            button.addEventListener('mouseleave', function () {
-                clearTimeout(hoverTimeout);
-                if (tooltipElement) {
-                    tooltipElement.remove();
-                    tooltipElement = null;
-                }
-            });
             if (deleteMode) {
                 button.classList.add('shaking');
             } else {
                 button.classList.remove('shaking');
             }
+            if (randomMode) {
+                button.classList.add('floating');
+            } else {
+                button.classList.remove('floating');
+            }
             buttonContainer.appendChild(button);
         }
     });
     addSpecialButton(buttonContainer, '一级目录');
-    addDeleteButton(buttonContainer);
+    const deleteButton = document.createElement('button');
+    const svgIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 56 56"><path fill="currentColor" d="M46.035 49.574c4.899 0 7.36-2.414 7.36-7.265V13.69c0-4.851-2.461-7.265-7.36-7.265H25.668c-2.742 0-5.11.703-7.031 2.742L4.832 23.512c-1.523 1.57-2.226 2.976-2.226 4.453c0 1.453.68 2.883 2.226 4.453L18.66 46.691c1.946 2.016 4.29 2.86 7.032 2.86Zm-5.46-11.203c-.563 0-1.055-.21-1.454-.586l-6.844-6.89l-6.867 6.89c-.398.375-.89.586-1.453.586c-1.148 0-2.11-.937-2.11-2.086c0-.539.235-1.054.634-1.476l6.82-6.844l-6.82-6.82c-.399-.422-.633-.938-.633-1.477c0-1.172.96-2.133 2.11-2.133c.538 0 1.054.211 1.476.633l6.843 6.844l6.82-6.844c.423-.422.938-.633 1.477-.633c1.172 0 2.11.961 2.11 2.133c0 .54-.211 1.055-.633 1.477l-6.82 6.82l6.82 6.844c.422.422.633.937.633 1.476c0 1.149-.961 2.086-2.11 2.086"/></svg>
+    `;
+    deleteButton.innerHTML = svgIcon;
+    deleteButton.className = 'button delete-button';
+    deleteButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        toggleDeleteMode();
+    });
+    buttonContainer.appendChild(deleteButton);
 }
 function getRandomDelay(min = 0, max = 200) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -480,6 +455,8 @@ function createSubmenu(superType, organizedData) {
         button.onclick = (event) => {
             if (deleteMode) {
                 handleDeleteClick.call(button, event);
+            } else if (randomMode) { // 新增随机模式判断
+                handleRandomClick.call(button, event);
             } else {
                 clearAllActiveStates(subcategoryList);
                 button.classList.add('active');
@@ -490,6 +467,11 @@ function createSubmenu(superType, organizedData) {
             button.classList.add('shaking');
         } else {
             button.classList.remove('shaking');
+        }
+        if (randomMode) {
+            button.classList.add('floating');
+        } else {
+            button.classList.remove('floating');
         }
         button.style.animationDelay = `${getRandomDelay()}ms`;
         button.addEventListener('animationend', () => {
@@ -507,39 +489,20 @@ function createPrompts(superType, dir, organizedData) {
         button.className = 'button button-item button-animate';
         button.setAttribute('data-text', item.text);
         button.textContent = `${item.text}(${item.lang_zh})`;
-        let hoverTimeout;
-        let tooltipElement;
         button.onclick = function (event) {
             if (deleteMode) {
                 handleDeleteClick.call(button, event);
             } else {
-                const newButton = createButton(this.textContent, this.getAttribute('data-text'));
-                const backFixedButtons = Array.from(dragDropArea.querySelectorAll('.button.fixed[data-fixed-position="back"]'));
-                insertButton(dragDropArea, newButton, backFixedButtons);
-                newButton.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const textToCopy = this.getAttribute('data-text');
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showTheTooltip(event, "已复制");
+                    const newButton = createButton(this.textContent, this.getAttribute('data-text'));
+                    const backFixedButtons = Array.from(dragDropArea.querySelectorAll('.button.fixed[data-fixed-position="back"]'));
+                    insertButton(dragDropArea, newButton, backFixedButtons);
+                    newButton.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                })
             }
         };
-        button.addEventListener('contextmenu', function (event) {
-            event.preventDefault();
-            const textToCopy = this.getAttribute('data-text');
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showTheTooltip(event, "已复制");
-            }).catch(err => {
-                console.error('复制失败:', err);
-            });
-        });
-        button.addEventListener('mouseenter', function (event) {
-            hoverTimeout = setTimeout(() => {
-                tooltipElement = showTheTooltip(event, "左键选择到编辑区\n右键仅复制");
-            }, 2000);
-        });
-        button.addEventListener('mouseleave', function () {
-            clearTimeout(hoverTimeout);
-            if (tooltipElement) {
-                tooltipElement.remove();
-                tooltipElement = null;
-            }
-        });
         if (deleteMode) {
             button.classList.add('shaking');
         } else {
@@ -554,17 +517,17 @@ function createPrompts(superType, dir, organizedData) {
     });
     initializeSelection();
 }
+
+
+
 function toggleFixedState(position) {
     if (this.classList.contains('fixed')) {
         this.classList.remove('fixed');
         this.removeAttribute('data-fixed-position');
-        showTooltip(this, '已取消固定');
     } else {
         this.classList.add('fixed');
         this.setAttribute('data-fixed-position', position);
-        showTooltip(this, position === 'front' ? '已固定在最前面' : '已固定在最后面');
     }
-    const dragDropArea = document.getElementById('drag-drop-area');
     dragDropArea.removeChild(this);
     if (position === 'front') {
         dragDropArea.insertBefore(this, dragDropArea.firstChild);
@@ -572,9 +535,8 @@ function toggleFixedState(position) {
         dragDropArea.appendChild(this);
     }
 }
-function createButton(textContent, dataText) {
+function createButton(dataText, textContent) {
     const newButton = document.createElement('button');
-    let hoverTimeout;
     newButton.className = 'button button-item';
     newButton.textContent = textContent;
     newButton.setAttribute('data-text', dataText);
@@ -586,27 +548,10 @@ function createButton(textContent, dataText) {
     newButton.addEventListener('dblclick', function () {
         this.remove();
     });
-    newButton.addEventListener('contextmenu', function (event) {
-        event.preventDefault();
-        if (this.clickTimeout) {
-            clearTimeout(this.clickTimeout);
-            this.clickTimeout = null;
-            toggleFixedState.call(this, 'front');
-        } else {
-            this.clickTimeout = setTimeout(() => {
-                toggleFixedState.call(this, 'back');
-                this.clickTimeout = null;
-            }, 300);
-        }
-    });
-    newButton.addEventListener('mouseenter', function (event) {
-        hoverTimeout = setTimeout(() => {
-            showTheTooltip(event, "左键双击 删除\n左键拖动 换位\n右键单击 置底\n右键双击 置顶");
-        }, 2000);
-    });
-    newButton.addEventListener('mouseleave', function () {
-        clearTimeout(hoverTimeout);
-    });
+    newButton.onclick = function () {
+        const textToCopy = this.getAttribute('data-text');
+        navigator.clipboard.writeText(textToCopy)
+    };
     return newButton;
 }
 function resetDragDropArea() {
@@ -627,6 +572,8 @@ function insertButton(dragDropArea, newButton, backFixedButtons) {
         dragDropArea.appendChild(newButton);
     }
 }
+
+
 function showTooltip(targetElement, message, duration = 500) {
     return new Promise((resolve) => {
         const tooltip = document.createElement('div');
@@ -659,6 +606,8 @@ document.addEventListener('mousemove', function () {
         tooltip.remove();
     });
 });
+
+
 function showCustomConfirm(message) {
     return new Promise((resolve) => {
         const overlay = document.createElement('div');
@@ -707,26 +656,9 @@ function showCustomConfirm(message) {
         });
     });
 }
-function addDeleteButton(container) {
-    const deleteButton = document.createElement('button');
-    const svgIcon = `
-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 56 56"><path fill="currentColor" d="M46.035 49.574c4.899 0 7.36-2.414 7.36-7.265V13.69c0-4.851-2.461-7.265-7.36-7.265H25.668c-2.742 0-5.11.703-7.031 2.742L4.832 23.512c-1.523 1.57-2.226 2.976-2.226 4.453c0 1.453.68 2.883 2.226 4.453L18.66 46.691c1.946 2.016 4.29 2.86 7.032 2.86Zm-5.46-11.203c-.563 0-1.055-.21-1.454-.586l-6.844-6.89l-6.867 6.89c-.398.375-.89.586-1.453.586c-1.148 0-2.11-.937-2.11-2.086c0-.539.235-1.054.634-1.476l6.82-6.844l-6.82-6.82c-.399-.422-.633-.938-.633-1.477c0-1.172.96-2.133 2.11-2.133c.538 0 1.054.211 1.476.633l6.843 6.844l6.82-6.844c.423-.422.938-.633 1.477-.633c1.172 0 2.11.961 2.11 2.133c0 .54-.211 1.055-.633 1.477l-6.82 6.82l6.82 6.844c.422.422.633.937.633 1.476c0 1.149-.961 2.086-2.11 2.086"/></svg>
-    `;
-    deleteButton.innerHTML = svgIcon;
-    deleteButton.className = 'button delete-button';
-    deleteButton.setAttribute('data-tooltip', '点击进入删除模式');
-    const tooltip = document.createElement('div');
-    tooltip.className = 'tooltip no-pointer';
-    document.body.appendChild(tooltip);
-    deleteButton.addEventListener('mouseleave', function () {
-        tooltip.classList.remove('show');
-    });
-    deleteButton.addEventListener('click', function (event) {
-        event.preventDefault();
-        toggleDeleteMode();
-    });
-    container.appendChild(deleteButton);
-}
+
+
+
 function toggleDeleteMode() {
     deleteMode = !deleteMode;
     const containers = ['#category-buttons', '#subcategory-list', '#content-list'];
@@ -770,15 +702,14 @@ function handleDeleteClick(event) {
     const button = this;
     const text = button.getAttribute('data-text') || button.textContent;
     const container = button.closest('#category-buttons, #subcategory-list, #content-list');
-    if (!container) {
-        console.error('未找到按钮所在的容器');
-        return;
-    }
+
     if (container.id === 'category-buttons') {
         showCustomConfirm(`确定要删除 "${text}" 及其所有子项吗？`).then(confirmed => {
             if (confirmed) {
                 deleteSuperType(text);
                 button.remove();
+                subcategoryList.innerHTML = '';
+                itemContainer.innerHTML = '';
             }
         });
     } else if (container.id === 'subcategory-list') {
@@ -786,6 +717,7 @@ function handleDeleteClick(event) {
             if (confirmed) {
                 deleteDir(text);
                 button.remove();
+                itemContainer.innerHTML = '';
             }
         });
     } else if (container.id === 'content-list') {
@@ -840,6 +772,7 @@ function deleteItem(itemText) {
         createMainMenu(updatedData);
     }
 }
+
 function disableOtherFunctions() {
     const aiButtons = document.querySelectorAll('.button-specialButton');
     aiButtons.forEach(button => button.disabled = true);
@@ -848,6 +781,101 @@ function enableOtherFunctions() {
     const aiButtons = document.querySelectorAll('.button-specialButton');
     aiButtons.forEach(button => button.disabled = false);
 }
+
+
+
+
+function handleRandomClick(event) {
+    event.stopPropagation();
+    const button = this;
+    const text = button.getAttribute('data-text') || button.textContent;
+    const container = button.closest('#category-buttons, #subcategory-list, #content-list');
+
+    let superType, dir;
+
+    if (container.id === 'category-buttons') {
+        superType = text;
+        // 在 superType 下随机选择一个 dir
+        const dirs = Object.keys(organizedData[superType]);
+        if (dirs.length === 0) {
+            alert('该类别下没有子目录。');
+            return;
+        }
+        dir = dirs[Math.floor(Math.random() * dirs.length)];
+    } else if (container.id === 'subcategory-list') {
+        superType = getActiveSuperType();
+        dir = text;
+    } else {
+        return; // 其他情况不处理
+    }
+
+    const prompt = getRandomPrompt(superType, dir);
+    if (prompt) {
+        const newButton = createButton(`${prompt.text}(${prompt.lang_zh})`, prompt.text);
+        const backFixedButtons = Array.from(dragDropArea.querySelectorAll('.button.fixed[data-fixed-position="back"]'));
+        insertButton(dragDropArea, newButton, backFixedButtons);
+        newButton.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        alert('该目录下没有提示词组。');
+    }
+}
+function getRandomPrompt(superType, dir) {
+    if (superType && dir && organizedData[superType] && organizedData[superType][dir]) {
+        const prompts = organizedData[superType][dir];
+        if (prompts.length === 0) return null;
+        const randomIndex = Math.floor(Math.random() * prompts.length);
+        return prompts[randomIndex];
+    }
+    return null;
+}
+function getActiveSuperType() {
+    const activeButton = buttonContainer.querySelector('.button.active');
+    return activeButton ? activeButton.textContent : null;
+}
+function addFloatingEffect() {
+    const containers = ['#category-buttons', '#subcategory-list'];
+    containers.forEach(containerSelector => {
+        const container = document.querySelector(containerSelector);
+        if (container) {
+            const dataButtons = container.querySelectorAll('.button-superType, .button-dir, .button-item');
+            const buttonsArray = Array.from(dataButtons);
+            shuffleArray(buttonsArray);
+            buttonsArray.forEach(button => {
+                const delay = Math.random() * 500; // 随机延迟 0 到 500 毫秒
+                setTimeout(() => {
+                    button.classList.add('floating');
+                    // 可以在需要时添加其他事件监听器或逻辑
+                }, delay);
+            });
+        }
+    });
+
+    disableOtherFunctions();
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+}
+
+function removeFloatingEffect() {
+    const containers = ['#category-buttons', '#subcategory-list'];
+    containers.forEach(containerSelector => {
+        const container = document.querySelector(containerSelector);
+        if (container) {
+            const dataButtons = container.querySelectorAll('.button-superType, .button-dir, .button-item');
+            dataButtons.forEach(button => {
+                button.classList.remove('floating');
+            });
+        }
+    });
+
+    enableOtherFunctions();
+}
+
+
+
 function addSpecialButton(container, level) {
     const specialButton = document.createElement('button');
     const svgIcon = `
@@ -855,168 +883,123 @@ function addSpecialButton(container, level) {
     `;
     specialButton.innerHTML = svgIcon;
     specialButton.className = 'button button-specialButton';
-    const tooltip = document.createElement('div');
-    tooltip.className = 'tooltip no-pointer';
-    document.body.appendChild(tooltip);
-    function updateTooltip() {
-        const tooltipText = `左键AI生成内容，右键设置AI服务`;
-        specialButton.setAttribute('data-tooltip', tooltipText);
-        if (tooltip.classList.contains('show')) {
-            const formattedText = tooltipText.replace(/，/g, '\n');
-            tooltip.textContent = formattedText;
-            const rect = specialButton.getBoundingClientRect();
-            tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - tooltip.offsetWidth / 2}px`;
-            tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 5}px`;
-        }
-    }
-    updateTooltip();
-    let isInputContainerVisible = false;
-    let isSettingsContainerVisible = false;
     specialButton.addEventListener('click', function (event) {
         event.preventDefault();
-        if (isSettingsContainerVisible) {
-            const existingSettings = document.querySelector('.custom-settings-container');
-            if (existingSettings) {
-                existingSettings.remove();
-                isSettingsContainerVisible = false;
-            }
+        const inputValue = inputBox.value.trim();
+        if (inputValue === '') {
+            statusMessage.textContent = '请先输入内容！';
+            inputBox.focus();
+            return;
         }
-        if (isInputContainerVisible) {
-            const existingInput = document.querySelector('.custom-input-container');
-            if (existingInput) {
-                existingInput.remove();
+        aiGenerateContent(inputValue, level).then(generatedContent => {
+            if (level === '编辑区') {
+                const dragDropArea = document.getElementById('drag-drop-area');
+                const newButton = createButton(generatedContent, generatedContent);
+                const backFixedButtons = Array.from(dragDropArea.querySelectorAll('.button.fixed[data-fixed-position="back"]'));
+                insertButton(dragDropArea, newButton, backFixedButtons);
+                newButton.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                updateCSV(generatedContent, level);
             }
-            isInputContainerVisible = false;
-        } else {
-            const inputContainer = document.createElement('div');
-            inputContainer.className = 'custom-input-container';
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.placeholder = `输入类目，AI扩展：`;
-            inputContainer.appendChild(input);
-            const confirmButton = document.createElement('button');
-            confirmButton.textContent = '生成';
-            confirmButton.className = 'button button-superType';
-            inputContainer.appendChild(confirmButton);
-            const cancelButton = document.createElement('button');
-            cancelButton.textContent = '取消';
-            cancelButton.className = 'button button-superType';
-            inputContainer.appendChild(cancelButton);
-            const categoryButtons = document.getElementById('category-buttons');
-            categoryButtons.parentNode.insertBefore(inputContainer, categoryButtons.nextSibling);
-            confirmButton.addEventListener('click', function () {
-                const userInput = input.value;
-                if (userInput) {
-                    inputContainer.classList.add('generating');
-                    input.style.opacity = '0';
-                    confirmButton.style.opacity = '0';
-                    cancelButton.style.opacity = '0';
-                    input.disabled = true;
-                    confirmButton.disabled = true;
-                    cancelButton.disabled = true;
-                    aiGenerateContent(userInput, level).then(generatedContent => {
-                        updateCSV(generatedContent, level);
-                        setTimeout(() => {
-                            inputContainer.remove();
-                            isInputContainerVisible = false;
-                        }, 50);
-                    });
-                }
-            });
-            cancelButton.addEventListener('click', function () {
-                setTimeout(() => {
-                    inputContainer.remove();
-                    isInputContainerVisible = false;
-                }, 50);
-            });
-            isInputContainerVisible = true;
-        }
-    });
-    specialButton.addEventListener('contextmenu', function (event) {
-        event.preventDefault();
-        if (isInputContainerVisible) {
-            const existingInput = document.querySelector('.custom-input-container');
-            if (existingInput) {
-                existingInput.remove();
-                isInputContainerVisible = false;
-            }
-        }
-        if (isSettingsContainerVisible) {
-            const existingSettings = document.querySelector('.custom-settings-container');
-            if (existingSettings) {
-                existingSettings.remove();
-            }
-            isSettingsContainerVisible = false;
-        } else {
-            const settingsContainer = document.createElement('div');
-            settingsContainer.className = 'custom-settings-container';
-            const savedTranslateAppId = localStorage.getItem('translateAppId') || '';
-            const savedTranslateKey = localStorage.getItem('translateKey') || '';
-            const translateAppIdInput = document.createElement('input');
-            translateAppIdInput.type = 'text';
-            translateAppIdInput.placeholder = '请输入百度翻译API AppID';
-            translateAppIdInput.value = savedTranslateAppId;
-            settingsContainer.appendChild(translateAppIdInput);
-            const translateKeyInput = document.createElement('input');
-            translateKeyInput.type = 'text';
-            translateKeyInput.placeholder = '请输入百度翻译API密钥';
-            translateKeyInput.value = savedTranslateKey;
-            settingsContainer.appendChild(translateKeyInput);
-            const savedApiKey = localStorage.getItem('aiApiKey') || '';
-            const savedModel = localStorage.getItem('aiModel') || '';
-            const savedProxyUrl = localStorage.getItem('proxyUrl') || '';
-            const apiKeyInput = document.createElement('input');
-            apiKeyInput.type = 'text';
-            apiKeyInput.placeholder = '请输入AI密钥，OpenAI兼容';
-            apiKeyInput.value = savedApiKey;
-            settingsContainer.appendChild(apiKeyInput);
-            const proxyInput = document.createElement('input');
-            proxyInput.type = 'text';
-            proxyInput.placeholder = '默认接口https://api.openai.com/v1/chat/completions';
-            proxyInput.value = savedProxyUrl;
-            settingsContainer.appendChild(proxyInput);
-            const settingsContainer2 = document.createElement('div');
-            settingsContainer2.className = 'custom-settings-container2';
-            settingsContainer.appendChild(settingsContainer2);
-            const modelInput = document.createElement('input');
-            modelInput.type = 'text';
-            modelInput.placeholder = '默认模型gpt-4o-mini';
-            modelInput.value = savedModel || '';
-            settingsContainer2.appendChild(modelInput);
-            const saveButton = document.createElement('button');
-            saveButton.textContent = '保存';
-            saveButton.className = 'button button-superType';
-            settingsContainer2.appendChild(saveButton);
-            const cancelButton = document.createElement('button');
-            cancelButton.textContent = '取消';
-            cancelButton.className = 'button button-superType';
-            settingsContainer2.appendChild(cancelButton);
-            const categoryButtons = document.getElementById('category-buttons');
-            categoryButtons.parentNode.insertBefore(settingsContainer, categoryButtons.nextSibling);
-            saveButton.addEventListener('click', function () {
-                const translateAppId = translateAppIdInput.value;
-                const translateKey = translateKeyInput.value;
-                const apiKey = apiKeyInput.value;
-                const proxyUrl = proxyInput.value;
-                const model = modelInput.value;
-                localStorage.setItem('translateAppId', translateAppId);
-                localStorage.setItem('translateKey', translateKey);
-                localStorage.setItem('aiApiKey', apiKey);
-                localStorage.setItem('proxyUrl', proxyUrl);
-                localStorage.setItem('aiModel', model);
-                showTooltip(saveButton, "设置已保存").then(() => {
-                    settingsContainer.remove();
-                    isSettingsContainerVisible = false;
-                });
-            });
-            cancelButton.addEventListener('click', function () {
-                settingsContainer.remove();
-                isSettingsContainerVisible = false;
-            });
-            isSettingsContainerVisible = true;
-        }
+        });
     });
     container.appendChild(specialButton);
+}
+function showSettingsDialog() {
+    const settingsContainer = document.createElement('div');
+    settingsContainer.className = 'custom-settings-container';
+    const savedTranslateAppId = localStorage.getItem('translateAppId') || '';
+    const savedTranslateKey = localStorage.getItem('translateKey') || '';
+    const translateAppIdInput = document.createElement('input');
+    translateAppIdInput.type = 'text';
+    translateAppIdInput.placeholder = '请输入百度翻译API AppID';
+    translateAppIdInput.value = savedTranslateAppId;
+    settingsContainer.appendChild(translateAppIdInput);
+    const translateKeyInput = document.createElement('input');
+    translateKeyInput.type = 'text';
+    translateKeyInput.placeholder = '请输入百度翻译API密钥';
+    translateKeyInput.value = savedTranslateKey;
+    settingsContainer.appendChild(translateKeyInput);
+    const savedApiKey = localStorage.getItem('aiApiKey') || '';
+    const savedModel = localStorage.getItem('aiModel') || '';
+    const savedProxyUrl = localStorage.getItem('proxyUrl') || '';
+    const apiKeyInput = document.createElement('input');
+    apiKeyInput.type = 'text';
+    apiKeyInput.placeholder = '请输入AI密钥，OpenAI兼容';
+    apiKeyInput.value = savedApiKey;
+    settingsContainer.appendChild(apiKeyInput);
+    const proxyInput = document.createElement('input');
+    proxyInput.type = 'text';
+    proxyInput.placeholder = '默认接口https://api.openai.com/v1/chat/completions';
+    proxyInput.value = savedProxyUrl;
+    settingsContainer.appendChild(proxyInput);
+    const modelInput = document.createElement('input');
+    modelInput.type = 'text';
+    modelInput.placeholder = '默认模型gpt-4o-mini';
+    modelInput.value = savedModel || '';
+    settingsContainer.appendChild(modelInput);
+    const settingsContainer2 = document.createElement('div');
+    settingsContainer2.className = 'custom-buttons';
+    settingsContainer.appendChild(settingsContainer2);
+    const saveButton = document.createElement('button');
+    saveButton.textContent = '保存';
+    saveButton.className = 'button button-superType';
+    settingsContainer2.appendChild(saveButton);
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = '取消';
+    cancelButton.className = 'button button-superType';
+    settingsContainer2.appendChild(cancelButton);
+    showDialog(settingsContainer);
+    saveButton.addEventListener('click', function () {
+        const translateAppId = translateAppIdInput.value;
+        const translateKey = translateKeyInput.value;
+        const apiKey = apiKeyInput.value;
+        const proxyUrl = proxyInput.value;
+        const model = modelInput.value;
+        localStorage.setItem('translateAppId', translateAppId);
+        localStorage.setItem('translateKey', translateKey);
+        localStorage.setItem('aiApiKey', apiKey);
+        localStorage.setItem('proxyUrl', proxyUrl);
+        localStorage.setItem('aiModel', model);
+        statusMessage.textContent = '设置已保存';
+        closeDialog();
+    });
+    cancelButton.addEventListener('click', function () {
+        closeDialog();
+    });
+}
+function observeDragDropArea() {
+    const dragDropArea = document.getElementById('drag-drop-area');
+    const observer = new MutationObserver(function (mutationsList, observer) {
+        ensureSpecialButtonExistsAndAtEnd();
+    });
+    observer.observe(dragDropArea, { childList: true });
+}
+function ensureSpecialButtonExistsAndAtEnd() {
+    const dragDropArea = document.getElementById('drag-drop-area');
+    let specialButton = dragDropArea.querySelector('.button-specialButton');
+    if (!specialButton) {
+        // 如果 specialButton 不存在，重新创建并添加它
+        addSpecialButton(dragDropArea, '编辑区');
+        specialButton = dragDropArea.querySelector('.button-specialButton');
+    }
+    if (specialButton && specialButton !== dragDropArea.lastElementChild) {
+        // 如果 specialButton 存在但不在最后，移动到最后
+        dragDropArea.appendChild(specialButton);
+    }
+}
+function showDialog(contentElement) {
+    const overlay = document.createElement('div');
+    overlay.className = 'custom-overlay';
+    overlay.appendChild(contentElement);
+    document.body.appendChild(overlay);
+    window.currentCustomDialogOverlay = overlay;
+}
+function closeDialog() {
+    if (window.currentCustomDialogOverlay) {
+        document.body.removeChild(window.currentCustomDialogOverlay);
+        window.currentCustomDialogOverlay = null;
+    }
 }
 async function aiGenerateContent(input, level) {
     const apiKey = localStorage.getItem('aiApiKey');
@@ -1066,6 +1049,9 @@ async function aiGenerateContent(input, level) {
         现在为"${input}"生成内容，保持纯文本相同的格式。
         不允许序号，不允许序号，不允许序号`;
     }
+    else if (level === '编辑区') {
+        prompt = `请扩写以下提示词到100字，全部使用短句："${input}"。`;
+    }
     const payload = {
         model: model,
         messages: [
@@ -1091,7 +1077,7 @@ async function aiGenerateContent(input, level) {
         }
         const data = await response.json();
         const generatedText = data.choices && data.choices[0]?.message?.content.trim();
-        return generatedText ? `生成的内容:\n${generatedText}` : '没有生成内容';
+        return generatedText ? `${generatedText}` : '没有生成内容';
     } catch (error) {
         console.error('AI生成内容错误:', error);
         throw error;
@@ -1141,8 +1127,22 @@ function updateCSV(generatedContent, level) {
         });
     }
 }
+
+
+
+
+
 let draggedItem = null;
 let placeholder = null;
+const actionBoxes = wrapper.querySelectorAll('.action-box');
+actionBoxes.forEach(box => {
+    box.addEventListener('dragover', handleDragOver);
+    box.addEventListener('dragenter', handleDragEnter);
+    box.addEventListener('dragleave', handleDragLeave);
+    box.addEventListener('drop', handleDrop);
+});
+dragDropArea.addEventListener('dragover', handleDragOver);
+dragDropArea.addEventListener('drop', handleDrop);
 function handleDragStart(e) {
     draggedItem = this;
     placeholder = document.createElement('div');
@@ -1155,45 +1155,145 @@ function handleDragStart(e) {
     setTimeout(() => {
         draggedItem.style.display = 'none';
     }, 0);
+    actionBoxes.forEach(box => {
+        box.style.display = 'flex';
+    });
 }
 function handleDragOver(e) {
     e.preventDefault();
     const target = e.target;
-    if (target && target !== draggedItem && target.classList.contains('button-item')) {
-        const rect = target.getBoundingClientRect();
-        const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
-        const parent = target.parentNode;
-        if (next) {
-            parent.insertBefore(placeholder, target.nextSibling);
+    if (target && target !== draggedItem) {
+        if (target.classList.contains('button-item')) {
+            const rect = target.getBoundingClientRect();
+            const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+            const parent = target.parentNode;
+            if (next) {
+                parent.insertBefore(placeholder, target.nextSibling);
+            } else {
+                parent.insertBefore(placeholder, target);
+            }
+        } else if (target.classList.contains('action-box')) {
+            // 高亮悬停的操作框
+            target.classList.add('highlight');
         } else {
-            parent.insertBefore(placeholder, target);
+            actionBoxes.forEach(box => box.classList.remove('highlight'));
         }
+    }
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+}
+function handleDragEnter(e) {
+    e.preventDefault();
+    if (this.classList.contains('action-box')) {
+        this.classList.add('highlight');
+    }
+}
+function handleDragLeave(e) {
+    if (this.classList.contains('action-box')) {
+        this.classList.remove('highlight');
     }
 }
 function handleDrop(e) {
     e.preventDefault();
     e.stopPropagation();
-    const parent = placeholder.parentNode;
-    if (parent && draggedItem) {
-        parent.insertBefore(draggedItem, placeholder);
+    const target = e.target;
+    if (target.classList.contains('action-box')) {
+        const action = target.getAttribute('data-action');
+        performAction(action, draggedItem);
+    } else if (target.classList.contains('button-item') || target === dragDropArea) {
+        const parent = placeholder.parentNode;
+        if (parent && draggedItem) {
+            parent.insertBefore(draggedItem, placeholder);
+        }
+        draggedItem.style.display = '';
+        draggedItem.classList.remove('dragging');
     }
-    draggedItem.style.display = '';
-    draggedItem.classList.remove('dragging');
-    placeholder.remove();
+    if (placeholder && placeholder.parentNode) {
+        placeholder.parentNode.removeChild(placeholder);
+    }
+    actionBoxes.forEach(box => box.classList.remove('highlight'));
     draggedItem = null;
     placeholder = null;
 }
 function handleDragEnd(e) {
     if (placeholder && placeholder.parentNode) {
-        placeholder.remove();
+        placeholder.parentNode.removeChild(placeholder);
     }
     if (draggedItem) {
         draggedItem.style.display = '';
         draggedItem.classList.remove('dragging');
     }
+    actionBoxes.forEach(box => box.classList.remove('highlight'));
+    actionBoxes.forEach(box => {
+        box.style.display = 'none';
+    });
     draggedItem = null;
     placeholder = null;
 }
+function performAction(action, item) {
+    switch (action) {
+        case 'pinToTop':
+            toggleFixedState.call(item, 'front');
+            break;
+        case 'pinToBottom':
+            toggleFixedState.call(item, 'back');
+            break;
+        case 'disassemble':
+            disassembleItem(item);
+            break;
+        case 'translate':
+            translateItem(item);
+            break;
+    }
+    item.style.display = '';
+    item.classList.remove('dragging');
+}
+async function disassembleItem(item) {
+    const fixedButtons = Array.from(dragDropArea.querySelectorAll('.button.fixed'));
+    const backFixedButtons = fixedButtons.filter(button => button.getAttribute('data-fixed-position') === 'back');
+    const existingTexts = fixedButtons.map(button => button.getAttribute('data-text'));
+    const text = item.getAttribute('data-text');
+    const parameterRegex = /--\S+\s+\S+/g;
+    const parameters = text.match(parameterRegex) || [];
+    const cleanText = text.replace(parameterRegex, '').trim();
+    const items = cleanText.split(/[，,。\.]+/);
+    for (const itemText of items) {
+        if (itemText.trim() !== '' && !existingTexts.includes(itemText.trim())) {
+            let newButtonText;
+            newButtonText = itemText.trim();
+            const newButton = createButton(itemText.trim(), newButtonText);
+            insertButton(dragDropArea, newButton, backFixedButtons);
+        }
+    }
+    for (const itemText of parameters) {
+        if (itemText.trim() !== '' && !existingTexts.includes(itemText.trim())) {
+            let newButtonText;
+            newButtonText = itemText.trim();
+            const newButton = createButton(itemText.trim(), newButtonText);
+            insertButton(dragDropArea, newButton, backFixedButtons);
+        }
+    }
+    item.remove();
+    backFixedButtons.forEach(button => dragDropArea.appendChild(button));
+}
+async function translateItem(item) {
+    const text = item.getAttribute('data-text');
+    let newButtonText;
+    if (isChinese(text.trim())) {
+        newButtonText = text.trim();
+    } else {
+        const translatedText = await translateAPI(text.trim());
+        newButtonText = translatedText ? `${text.trim()}\.(${translatedText})` : text.trim();
+    }
+    item.setAttribute('data-text', text.trim());
+    item.textContent = newButtonText;
+}
+
+
+
+
+
+
 document.querySelectorAll('.button-item').forEach(button => {
     button.draggable = true;
     button.addEventListener('dragstart', handleDragStart);
@@ -1207,9 +1307,7 @@ copyButton.addEventListener('click', function () {
     let concatenatedTexts = buttonTexts.join(', ');
     concatenatedTexts = concatenatedTexts.replace(/, --/g, ' --');
     navigator.clipboard.writeText(concatenatedTexts).then(() => {
-        showTooltip(copyButton, "已复制");
-    }).catch(err => {
-        console.error('复制文本失败: ', err);
+        statusMessage.textContent = '已复制';
     });
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         if (tabs && tabs[0] && tabs[0].id) {
@@ -1231,44 +1329,19 @@ copyButton.addEventListener('click', function () {
         }
     });
 });
-copyButton.addEventListener('contextmenu', function (event) {
-    event.preventDefault();
-    const buttons = document.querySelectorAll('#drag-drop-area .button');
-    const buttonTexts = Array.from(buttons).map(button => button.getAttribute('data-text'));
-    let concatenatedTexts = buttonTexts.join(', ');
-    concatenatedTexts = concatenatedTexts.replace(/, --/g, ' --');
-    navigator.clipboard.writeText(concatenatedTexts).then(() => {
-        showTooltip(copyButton, "已复制");
-    }).catch(err => {
-        console.error('复制文本失败(右击): ', err);
-    });
-});
 processButton.addEventListener('click', () => {
-    const { dragDropArea, fixedButtons, backFixedButtons } = resetDragDropArea();
-    const existingTexts = fixedButtons.map(button => button.getAttribute('data-text'));
-    let addedTexts = [];
-    for (let i = 0; i < cycleNumber;) {
-        let superTypes = Object.keys(organizedData);
-        const skippedSuperTypes = Array.from(document.querySelectorAll('#category-buttons .button-superType.skip, #category-buttons .button-superType.active-skip'))
-            .map(button => button.textContent);
-        superTypes = superTypes.filter(superType => !skippedSuperTypes.includes(superType));
-        if (superTypes.length === 0) {
-            break;
-        }
-        const randomSuperType = superTypes[Math.floor(Math.random() * superTypes.length)];
-        const dirs = Object.keys(organizedData[randomSuperType]);
-        const randomDir = dirs[Math.floor(Math.random() * dirs.length)];
-        const items = organizedData[randomSuperType][randomDir];
-        const randomItem = items[Math.floor(Math.random() * items.length)];
-        if (!existingTexts.includes(randomItem.text) && !addedTexts.includes(randomItem.text)) {
-            const newButton = createButton(`${randomItem.text}(${randomItem.lang_zh})`, randomItem.text);
-            insertButton(dragDropArea, newButton, backFixedButtons);
-            addedTexts.push(randomItem.text);
-            i++;
-        }
+    randomMode = !randomMode;
+    if (randomMode) {
+
+        processButton.classList.add('active');
+        statusMessage.textContent = '已切换到随机模式';
+        addFloatingEffect();
+    } else {
+        statusMessage.textContent = '已关闭随机模式';
+
+        processButton.classList.remove('active');
+        removeFloatingEffect();
     }
-    backFixedButtons.forEach(button => dragDropArea.appendChild(button));
-    showTooltip(processButton, "已刷新");
 });
 function isChinese(text) {
     return /[\u4e00-\u9fa5]/.test(text);
@@ -1307,44 +1380,39 @@ clipboardButton.addEventListener('click', async function () {
     const existingTexts = fixedButtons.map(button => button.getAttribute('data-text'));
     try {
         const text = await navigator.clipboard.readText();
-        const parameterRegex = /--\S+\s+\S+/g;
-        const parameters = text.match(parameterRegex) || [];
-        const cleanText = text.replace(parameterRegex, '').trim();
-        const items = cleanText.split(/[，,。\.]+/);
-        for (const itemText of items) {
-            if (itemText.trim() !== '' && !existingTexts.includes(itemText.trim())) {
-                let newButtonText;
-                if (isChinese(itemText.trim())) {
-                    newButtonText = itemText.trim();
-                } else {
-                    const translatedText = await translateAPI(itemText.trim());
-                    newButtonText = translatedText ? `${itemText.trim()}(${translatedText})` : itemText.trim();
-                }
-                const newButton = createButton(newButtonText, itemText.trim());
-                insertButton(dragDropArea, newButton, backFixedButtons);
-            }
-        }
-        for (const itemText of parameters) {
-            if (itemText.trim() !== '' && !existingTexts.includes(itemText.trim())) {
-                let newButtonText;
-                if (isChinese(itemText.trim())) {
-                    newButtonText = itemText.trim();
-                } else {
-                    const translatedText = await translateAPI(itemText.trim());
-                    newButtonText = translatedText ? `${itemText.trim()}(${translatedText})` : itemText.trim();
-                }
-                const newButton = createButton(newButtonText, itemText.trim());
-                insertButton(dragDropArea, newButton, backFixedButtons);
-            }
+        if (text.trim() !== '' && !existingTexts.includes(text.trim())) {
+            const newButton = createButton(text.trim(), text.trim());
+            insertButton(dragDropArea, newButton, backFixedButtons);
         }
     } catch (error) {
         console.error('读取剪贴板内容出错:', error);
         statusMessage.textContent = '读取剪贴板失败';
     }
+    // 恢复固定按钮
     backFixedButtons.forEach(button => dragDropArea.appendChild(button));
 });
-clipboardButton.addEventListener('contextmenu', function (event) {
-    event.preventDefault();
+document.addEventListener('DOMContentLoaded', function () {
+    let darkModePreference = localStorage.getItem('darkMode');
+    if (!darkModePreference) {
+        const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        darkModePreference = prefersDarkMode ? 'enabled' : 'disabled';
+        localStorage.setItem('darkMode', darkModePreference);
+    }
+    if (darkModePreference === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
+});
+themeToggleButton.addEventListener('click', function () {
+    document.body.classList.toggle('dark-mode');
+    if (document.body.classList.contains('dark-mode')) {
+        localStorage.setItem('darkMode', 'enabled');
+        statusMessage.textContent = '已切换到深色模式';
+    } else {
+        localStorage.setItem('darkMode', 'disabled');
+        statusMessage.textContent = '已切换到浅色模式';
+    }
+});
+loveButton.addEventListener('click', function () {
     const dragDropArea = document.getElementById('drag-drop-area');
     const buttons = dragDropArea.querySelectorAll('.button');
     const currentDate = new Date();
@@ -1389,86 +1457,10 @@ clipboardButton.addEventListener('contextmenu', function (event) {
         csvData = csvData.concat(newEntries);
         localStorage.setItem('parsedCSVData', JSON.stringify(csvData));
         createMainMenu(csvData);
-        showTooltip(clipboardButton, `已收藏到 '收藏' 分类，编号: ${dir}`);
+        statusMessage.textContent = '已收藏';
     } else {
-        showTooltip(clipboardButton, "没有可收藏的内容");
+        statusMessage.textContent = '没有可收藏的内容';
     }
-});
-document.addEventListener('DOMContentLoaded', function () {
-    let darkModePreference = localStorage.getItem('darkMode');
-    if (!darkModePreference) {
-        const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        darkModePreference = prefersDarkMode ? 'enabled' : 'disabled';
-        localStorage.setItem('darkMode', darkModePreference);
-    }
-    if (darkModePreference === 'enabled') {
-        document.body.classList.add('dark-mode');
-    }
-});
-themeToggleButton.addEventListener('click', function () {
-    document.body.classList.toggle('dark-mode');
-    if (document.body.classList.contains('dark-mode')) {
-        localStorage.setItem('darkMode', 'enabled');
-    } else {
-        localStorage.setItem('darkMode', 'disabled');
-    }
-});
-loveButton.addEventListener('click', function () {
-    const storeUrl = 'https://microsoftedge.microsoft.com/addons/detail/choosejourney/mfpjhghgmaicdaaljjgiglmmdjoiacga';
-    window.open(storeUrl, '_blank');
-});
-document.addEventListener('DOMContentLoaded', function () {
-    let tooltip;
-    const tooltipTexts = [
-        '太好用了得狠狠爱❤️',
-        '谢谢很高兴能帮到你🤝',
-        '感谢鼓励，继续完善！🫡',
-        '每一点鼓励都是巨大的鼓励🌟'
-    ];
-    let hideTimeout;
-    loveButton.addEventListener('mouseenter', function () {
-        if (tooltip) {
-            clearTimeout(hideTimeout);
-            return;
-        }
-        tooltip = document.createElement('div');
-        tooltip.classList.add('tooltip');
-        const tooltipText = document.createElement('div');
-        const randomIndex = Math.floor(Math.random() * tooltipTexts.length);
-        tooltipText.textContent = tooltipTexts[randomIndex];
-        tooltip.appendChild(tooltipText);
-        document.body.appendChild(tooltip);
-        const rect = loveButton.getBoundingClientRect();
-        tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - tooltip.offsetWidth / 2}px`;
-        tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 10}px`;
-        tooltip.classList.add('show');
-        tooltip.addEventListener('mouseenter', function () {
-            clearTimeout(hideTimeout);
-        });
-        tooltip.addEventListener('mouseleave', function () {
-            hideTimeout = setTimeout(function () {
-                tooltip.remove();
-                tooltip = null;
-            }, 300);
-        });
-        img.addEventListener('mouseenter', function () {
-            clearTimeout(hideTimeout);
-        });
-        img.addEventListener('mouseleave', function () {
-            hideTimeout = setTimeout(function () {
-                tooltip.remove();
-                tooltip = null;
-            }, 300);
-        });
-    });
-    loveButton.addEventListener('mouseleave', function () {
-        hideTimeout = setTimeout(function () {
-            if (tooltip && !tooltip.matches(':hover')) {
-                tooltip.remove();
-                tooltip = null;
-            }
-        }, 300);
-    });
 });
 statusMessage.addEventListener('click', function () {
     const downloadLink = document.createElement('a');
@@ -1482,20 +1474,10 @@ statusMessage.addEventListener('click', function () {
     if (csvData) {
         const parsedData = JSON.parse(csvData);
         const csvContent = convertToCSV(parsedData);
-        downloadCSV(csvContent, 'updated_data.csv');
+        downloadCSV(csvContent, 'updated_prompts.csv');
     } else {
         alert('没有更新的 CSV 数据');
     }
-});
-statusMessage.addEventListener('contextmenu', function (event) {
-    event.preventDefault();
-    const downloadLink = document.createElement('a');
-    downloadLink.href = chrome.runtime.getURL('prompts.csv');
-    downloadLink.download = 'prompts.csv';
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
 });
 function convertToCSV(data) {
     const header = ['text', 'lang_zh', 'dir', 'superType'];
@@ -1530,7 +1512,6 @@ fileInput.addEventListener('change', function () {
     }
 });
 clearButton.addEventListener('click', function () {
-    const dragDropArea = document.getElementById('drag-drop-area');
     const nonFixedButtons = dragDropArea.querySelectorAll('.button:not(.fixed)');
     nonFixedButtons.forEach(button => dragDropArea.removeChild(button));
     const fixedButtons = Array.from(dragDropArea.querySelectorAll('.button.fixed'));
@@ -1544,14 +1525,145 @@ clearButton.addEventListener('click', function () {
         textarea.value = '';
     }
 });
-clearButton.addEventListener('contextmenu', function (event) {
-    event.preventDefault();
-    if (isUpperSectionHidden) {
-        upperSection.style.display = 'flex';
-        lowerSection.style.flex = '3';
+
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const setButton = document.getElementById('set-button');
+    if (setButton) {
+        setButton.addEventListener('click', function (event) {
+            event.preventDefault();
+            showSettingsDialog();
+        });
     } else {
-        upperSection.style.display = 'none';
-        lowerSection.style.flex = '1';
+        console.error('未找到 id 为 "set-button" 的按钮元素。');
     }
-    isUpperSectionHidden = !isUpperSectionHidden;
+});
+document.addEventListener('DOMContentLoaded', () => {
+    submitButton.addEventListener('click', () => {
+        const inputValue = inputBox.value.trim();
+        if (inputValue === '') {
+            statusMessage.textContent = '请先输入内容！';
+            inputBox.focus();
+            return;
+        }
+        const newButton = createButton(inputValue, inputValue);
+        dragDropArea.appendChild(newButton);
+        inputBox.value = '';
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    /* 主分隔线相关元素 */
+    const mainDivider = document.querySelector('.divider');
+    const upperSection = document.getElementById('upper-section');
+    const lowerSection = document.getElementById('lower-section');
+    const sidebarContainer = document.getElementById('sidebar-container');
+
+    /* 上部分分隔线相关元素 */
+    const upDivider = document.querySelector('.up-divider');
+    const itemContainer = document.getElementById('item-container');
+    const subcategoryList = document.getElementById('subcategory-list');
+
+    /*** 主分隔线拖动逻辑 ***/
+    let isMainDragging = false;
+
+    mainDivider.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        isMainDragging = true;
+
+        const startY = e.clientY;
+        const containerHeight = sidebarContainer.getBoundingClientRect().height;
+        const upperFlex = parseFloat(getComputedStyle(upperSection).flex);
+        const lowerFlex = parseFloat(getComputedStyle(lowerSection).flex);
+
+        function onMainMouseMove(e) {
+            if (!isMainDragging) return;
+
+            const deltaY = e.clientY - startY;
+            const deltaFlex = (deltaY / containerHeight) * 10; // 基准数为10，可根据需求调整
+
+            let newUpperFlex = upperFlex + deltaFlex;
+            let newLowerFlex = lowerFlex - deltaFlex;
+
+            const minFlex = 2; // 设置最小flex值以防止区域过小
+
+            if (newUpperFlex < minFlex) {
+                newUpperFlex = minFlex;
+                newLowerFlex = upperFlex + lowerFlex - minFlex;
+            } else if (newLowerFlex < minFlex) {
+                newLowerFlex = minFlex;
+                newUpperFlex = upperFlex + lowerFlex - minFlex;
+            }
+
+            upperSection.style.flex = newUpperFlex;
+            lowerSection.style.flex = newLowerFlex;
+        }
+
+        function onMainMouseUp() {
+            isMainDragging = false;
+            document.removeEventListener('mousemove', onMainMouseMove);
+            document.removeEventListener('mouseup', onMainMouseUp);
+        }
+
+        document.addEventListener('mousemove', onMainMouseMove);
+        document.addEventListener('mouseup', onMainMouseUp);
+    });
+
+
+
+    /*** 上部分分隔线拖动逻辑 ***/
+    let isUpDragging = false;
+
+    upDivider.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        isUpDragging = true;
+
+        const startY = e.clientY;
+        const upperSectionHeight = upperSection.getBoundingClientRect().height;
+        const itemHeight = itemContainer.getBoundingClientRect().height;
+        const categoryrHeight = subcategoryList.getBoundingClientRect().height;
+
+        function onUpMouseMove(e) {
+            if (!isUpDragging) return;
+
+            const deltaY = e.clientY - startY;
+
+            let newItemHeight = itemHeight + deltaY;
+            let newCategoryrHeight = categoryrHeight - deltaY;
+
+
+            // 计算flex比例
+            const itemFlex = newItemHeight / upperSectionHeight * 7;
+            const categoryrFlex = newCategoryrHeight / upperSectionHeight * 7;
+
+            const minFlex = 1;
+
+            if (itemFlex < minFlex) {
+                itemFlex = minFlex;
+                itemContainer.style.flex = itemFlex;
+                subcategoryList.style.flex = '1 1 auto';
+            } else if (categoryrFlex < minFlex) {
+                categoryrFlex = minFlex;
+                subcategoryList.style.flex = categoryrFlex;
+                itemContainer.style.flex = '1 1 auto';
+            } else {
+                itemContainer.style.flex = itemFlex;
+                subcategoryList.style.flex = categoryrFlex;
+            }
+
+        }
+
+        function onUpMouseUp() {
+            isUpDragging = false;
+            document.removeEventListener('mousemove', onUpMouseMove);
+            document.removeEventListener('mouseup', onUpMouseUp);
+        }
+
+        document.addEventListener('mousemove', onUpMouseMove);
+        document.addEventListener('mouseup', onUpMouseUp);
+    });
+
 });
