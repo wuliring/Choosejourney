@@ -525,6 +525,9 @@ body {
     border-color: #292c32;
 }
 
+
+
+
 .dark-mode .drag-drop-area,
 .dark-mode .flex-item,
 .dark-mode .flex-item-grow {
@@ -609,6 +612,17 @@ body {
     border-color: #222428;
     background-color: #292c32;
     color: #c6c9d2;
+}
+
+
+.dark-mode .up-divider,
+.dark-mode .divider {
+    background-color: #1e1f25;
+}
+
+
+.dark-mode .divider .line.long {
+    width: 20px;
 }
 
 .custom-input-container {

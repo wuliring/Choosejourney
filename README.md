@@ -57,10 +57,6 @@ For example, in fine arts, there are painting techniques, styles, and schools of
 
 3. Get started 🎉!
 
-# How to Use
-
-See [Tutorial](https://www.bilibili.com/video/BV1JyyoYLEM7/?vd_source=0d9e91cd63d05b51d2de4a17f8085642)
-
 # What Do I Need to Prepare?
 
 - The API address and key for the large language model

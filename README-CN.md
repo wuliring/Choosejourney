@@ -50,10 +50,6 @@
 
 3. 开始使用吧 🎉!
 
-# 怎么使用
-
-见[教程](https://www.bilibili.com/video/BV1JyyoYLEM7/?vd_source=0d9e91cd63d05b51d2de4a17f8085642)。
-
 # 需要准备些什么
 
 - 大语言模型的 API 地址及密钥
